@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 steamapps_dst="/home/steam/steamapps/DST"
 service_archives="/home/steam/.klei/DoNotStarveTogether/"
 service_mods="/home/steam/steamapps/DST/mods/dedicated_server_mods_setup.lua"
@@ -71,8 +70,30 @@ build() {
     buildGameMod
 }
 
-# stop() {
+update() {
+expect << EOF
+	set timeout -1
+	spawn su - steam
+    expect -re "steam.*$" {send "cd ~/steamcmd\r"}
+    expect -re "steam.*$" {send "./steamcmd.sh\r"}
+    expect -re "Steam>" {send "force_install_dir ${steamapps_dst}\r"}
+    expect -re "Steam>" {send "login anonymous\r"}
+    expect -re "Steam>" {send "app_update 343050 validate\r"}
+    expect -re "Steam>" {send "exit\r"}
 
+    expect -re "steam.*$" {send "exit\r"}
+	expect eof
+EOF
+}
+
+# stop() {
+    # setsid ./dontstarve_dedicated_server_nullrenderer_x64 --cluster Cluster_1
+    
+    # # 显示如下日志则成功
+    # # [00:00:23]: Server registered via geo DNS in Sing
+    # # [00:00:23]: Sim paused
+    
+    # setsid ./dontstarve_dedicated_server_nullrenderer_x64 --cluster Cluster_1 --shard Caves
 # }
 
 # start() {
@@ -100,20 +121,6 @@ build() {
 #     start
 # }
 
-# update() {
-#     sudo su - steam
-
-#     cd /home/steam/steamapps/DST/bin64
-    
-#     setsid ./dontstarve_dedicated_server_nullrenderer_x64 --cluster Cluster_1
-    
-#     # 显示如下日志则成功
-#     # [00:00:23]: Server registered via geo DNS in Sing
-#     # [00:00:23]: Sim paused
-    
-#     setsid ./dontstarve_dedicated_server_nullrenderer_x64 --cluster Cluster_1 --shard Caves
-# }
-
 # replace() {
 
 # }
@@ -131,6 +138,8 @@ build() {
 main() {
     if [ ${1} == "build" ]; then
         build $2
+    elif [ ${1} == "update" ]; then
+        update
     fi
 }
 
