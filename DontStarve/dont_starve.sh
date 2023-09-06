@@ -3,6 +3,7 @@
 steamapps_dst="/home/steam/steamapps/DST"
 service_archives="/home/steam/.klei/DoNotStarveTogether/"
 service_mods="/home/steam/steamapps/DST/mods/dedicated_server_mods_setup.lua"
+archive_mods="/Master/modoverrides.lua"
 
 buildBaseInstall() {
     dpkg --add-architecture i386
@@ -15,6 +16,7 @@ buildBaseInstall() {
 
 buildSteamTool() {
     local steamcmd_linux="https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz"
+
 expect << EOF
 	set timeout -1
 	spawn su - steam
@@ -35,7 +37,7 @@ EOF
 }
 
 buildGameFile() {
-    echo "cp -rf $1 ${service_archives}"
+    mkdir -p ${service_archives}
     cp -rf $1 ${service_archives}
     archive="${1##*/}"
     cd ${service_archives}
@@ -43,13 +45,11 @@ buildGameFile() {
 }
 
 buildGameMod() {
-    mod="${service_mods##*/}"
-    cd "${service_mods%/*}"
-    echo "install mode\n"
+    # mod="${service_mods##*/}"
+    # cd "${service_mods%/*}"
 
-    # 编辑文件 `/home/steam/steamapps/DST/mods/dedicated_server_mods_setup.lua`
-
-    # -- ServerModSetup("623749604")
+    awk -v smods=${service_mods} '/\[\"workshop-[0-9]*\"\]/{gsub(/[^0-9]+/,"",$1); system("echo ServerModSetup\(\\\"" $1 "\\\"\) >> " smods)}' ${1}${archive_mods}
+    sed -i "s/\r//g" ${service_mods}
 }
 
 build() {
@@ -67,7 +67,7 @@ build() {
     buildGameFile $1
 
     # mod安装
-    buildGameMod
+    buildGameMod $1
 }
 
 update() {
