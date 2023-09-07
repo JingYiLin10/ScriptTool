@@ -39,7 +39,7 @@ EOF
 buildGameFile() {
     mkdir -p ${service_archives}
     cp -rf $1 ${service_archives}
-    archive="${1##*/}"
+    local archive="${1##*/}"
     cd ${service_archives}
     chown -R steam:steam ${archive}
 }
@@ -84,6 +84,22 @@ expect << EOF
     expect -re "steam.*$" {send "exit\r"}
 	expect eof
 EOF
+}
+
+show() {
+    cd ${service_archives}
+    index=0
+    ls -l | while read line
+    do
+        let index++
+        local archive=${line##* }
+        if [ ${index} -eq 1 -o ! -d ${archive} -o ! -f ${archive}/cluster.ini ]; then
+            continue
+        fi
+        echo "${archive}:"
+        awk '/cluster_name|cluster_password/{print}' ./${archive}/cluster.ini
+        echo
+    done
 }
 
 # stop() {
@@ -140,6 +156,8 @@ main() {
         build $2
     elif [ ${1} == "update" ]; then
         update
+    elif [ ${1} == "show" ]; then
+        show
     fi
 }
 
