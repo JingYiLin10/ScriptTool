@@ -4,6 +4,7 @@ steamapps_dst="/home/steam/steamapps/DST"
 service_archives="/home/steam/.klei/DoNotStarveTogether/"
 service_mods="/home/steam/steamapps/DST/mods/dedicated_server_mods_setup.lua"
 archive_mods="/Master/modoverrides.lua"
+server_progess="dontstarve_dedicated_server_nullrenderer_x64"
 
 buildBaseInstall() {
     dpkg --add-architecture i386
@@ -102,35 +103,25 @@ show() {
     done
 }
 
-# stop() {
-    # setsid ./dontstarve_dedicated_server_nullrenderer_x64 --cluster Cluster_1
-    
-    # # 显示如下日志则成功
-    # # [00:00:23]: Server registered via geo DNS in Sing
-    # # [00:00:23]: Sim paused
-    
-    # setsid ./dontstarve_dedicated_server_nullrenderer_x64 --cluster Cluster_1 --shard Caves
-# }
+stop() {
+    pidof ${server_progess}
+    if [ $? -eq 0 ]; then
+        kill -9 `pidof ${server_progess}`
+    fi
+}
 
-# start() {
-# expect << EOF
-# 	set timeout -1
-# 	spawn su - steam
-# 	expect -re "steam.*$" {send "cd ${}\r"}
-# 	expect -re "steam.*$" {send "cd ~/steamcmd\r"}
-#     expect -re "steam.*$" {send "wget ${steamcmd_linux}\r"}
-#     expect -re "steam.*$" {send "tar -xvzf steamcmd_linux.tar.gz\r"}
+start() {
+expect << EOF
+	set timeout -1
+	spawn su - steam
+	expect -re "steam.*$" {send "cd ~/steamapps/DST/bin64\r"}
 
-#     expect -re "steam.*$" {send "./steamcmd.sh\r"}
-#     expect -re "Steam>" {send "force_install_dir ${steamapps_dst}\r"}
-#     expect -re "Steam>" {send "login anonymous\r"}
-#     expect -re "Steam>" {send "app_update 343050 validate\r"}
-#     expect -re "Steam>" {send "exit\r"}
-
-#     expect -re "steam.*$" {send "exit\r"}
-# 	expect eof
-# EOF
-# }
+    expect -re "steam.*$" {send "setsid ./${server_progess} --cluster ${1}\r"}
+    expect -re "Sim paused" {send "setsid ./${server_progess} --cluster ${1} --shard Caves\r"}
+    expect -re "Sim paused" {send "exit\r"}
+	expect eof
+EOF
+}
 
 # restart() {
 #     stop
@@ -158,6 +149,12 @@ main() {
         update
     elif [ ${1} == "show" ]; then
         show
+    elif [ ${1} == "start" ]; then
+        start $2
+    elif [ ${1} == "stop" ]; then
+        stop
+    elif [ ${1} == "restart" ]; then
+        restart
     fi
 }
 

@@ -41,12 +41,18 @@
 ./dont_starve.sh update
 ```
 
-### 覆盖
+### 新增存档
 
 需要准备新世界的Cluster_1目录。
 
 ```bash
-./dont_starve.sh replace ./Cluster_1
+./dont_starve.sh add ./Cluster_1
+```
+
+### 移除存档
+
+```bash
+./dont_starve.sh remove Cluster_1
 ```
 
 ### 存档显示
