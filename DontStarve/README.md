@@ -8,19 +8,30 @@
 
 2核、4G内存、1M宽带、debian或ubuntu系统。
 
-
 ## 服务控制
 
 ### 构建服务器
 
 ```bash
-./dont_starve.sh build ./Cluster_1
+./dont_starve.sh build
 ```
 
-### 停止
+### Token
 
 ```bash
-./dont_starve.sh stop
+./dont_starve.sh token xxxx
+```
+
+### 更新
+
+```bash
+./dont_starve.sh update
+```
+
+### 存档显示
+
+```bash
+./dont_starve.sh show
 ```
 
 ### 启动
@@ -29,16 +40,16 @@
 ./dont_starve.sh start
 ```
 
+### 停止
+
+```bash
+./dont_starve.sh stop
+```
+
 ### 重启
 
 ```bash
 ./dont_starve.sh restart
-```
-
-### 更新
-
-```bash
-./dont_starve.sh update
 ```
 
 ### 新增存档
@@ -53,16 +64,4 @@
 
 ```bash
 ./dont_starve.sh remove Cluster_1
-```
-
-### 存档显示
-
-```bash
-./dont_starve.sh show
-```
-
-### Token
-
-```bash
-./dont_starve.sh token xxxx
 ```
